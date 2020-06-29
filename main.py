@@ -1,5 +1,4 @@
 import random
-import time
 
 CARDS = [1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 7, 8, 8, 8, 8, 9, 9, 9, 9, 10, 10, 10, 10, 11, 11, 11, 11, 12, 12, 12, 12, 13, 13, 13, 13   
 ]
@@ -15,107 +14,95 @@ money_player = 100
 pot = 0
 
 
-def result(x):
-    global money_player
-    global money_dealer
-
-    if x == "win":
-        money_dealer -= pot
-        money_player += pot
-        return "Player wins: " + str(pot)
-    elif x == "lose":
-        money_dealer -= pot
-        money_player += pot
-        return "Dealer wins: " + str(pot)
-
-
-def draw():
-    global count 
-
-    card = random.choice(CARDS)
-
-    if card in DECK:
-        DECK.remove(card)
-        CARDS.remove(card)
-        # print(DECK)
-        if card >= 2 and card <= 6:
-            count += 1
-        elif card == 1 or card >= 10 and card <= 13: 
-            count -= 1
-    
-    # if count >= 1:
-    #     print(count, card, "hit")
-    # elif count <= 0:
-    #     print(count, card, "hold/stay")
-        
-    if not CARDS:
-        print("No more cards in deck")
-        quit()
-
-    return card
-
-
-def hold():
+def deal():
+    global count
     global bot_player
-    global bot_dealer
-
-    if sum(bot_player) < sum(bot_dealer):
-        result("win")
-    else:
-        result("lose")
-
-
-def CountTally():
-    global count 
-
-    card = random.choice(CARDS)
-    if card in DECK:
-        DECK.remove(card)
-        CARDS.remove(card)
-        print(DECK)
-        if card >= 2 and card <= 6:
-            count += 1
-        elif card == 1 or card >= 10 and card <= 13: 
-            count -= 1
-    
-    # if count >= 1:
-    #     print(count, card, "hit")
-    # elif count <= 0:
-    #     print(count, card, "hold/stay")
-        
-    if not CARDS and not DECK:
-        print("No more cards in deck")
-        quit()
-        
-
-def game():        
     global bot_player
-    global bot_dealer
-    
+    global CARDS
+    global DECK
+
     while True:
-        bot_player.append(draw())
-        bot_player.append(draw())
-        bot_dealer.append(draw())
-        bot_dealer.append(draw())
+        if len(bot_player) < 2:
+            card = random.choice(CARDS)
+            if card in DECK:
+                DECK.remove(card)
+                CARDS.remove(card)
+                # if card >= 2 and card <= 6:
+                #     count += 1
+                # elif card == 1 or card >= 10 and card <= 13: 
+                #     count -= 1
+                bot_player.append(card)
+                cc(card)
+        
+        if len(bot_dealer) < 2:
+            card = random.choice(CARDS)
+            if card in DECK:
+                DECK.remove(card)
+                CARDS.remove(card)
+                # if card >= 2 and card <= 6:
+                #     count += 1
+                # elif card == 1 or card >= 10 and card <= 13: 
+                #     count -= 1
+                bot_dealer.append(card)
+                cc(card)
+        
+        if len(bot_player) == 2 and len(bot_player) == 2:
+            break
 
-        if sum(bot_player) <= 21 or sum(bot_dealer) <= 21: 
-            print(bot_player, "=", sum(bot_player), "-", "Count: ", count)
-            print(bot_dealer, "=", sum(bot_dealer))
 
-            if count > 0:
-                print("Player hits at: " + str(sum(bot_player)))
-                bot_player.append(draw())
-            else:
-                print("Player holds at: " + str(sum(bot_player)))
-                hold()
-        else:
-            continue
+def cc(card):
+    global count
 
-            
+    if card >= 2 and card <= 6:
+        count += 1
+    elif card == 1 or card >= 10 and card <= 13:
+        count -= 1
 
 
-game()
+def option(x):
+    global count
+    global bot_player
+    global CARDS
+    global DECK
+    global game
 
-    # CountTally()
-# elif card not in DECK:
-#     print("Not in deck")
+    if sum(bot_player) <= 14 or x >= 1:
+        print("Count is", count)
+        card = random.choice(CARDS)
+        bot_player.append(card)
+        DECK.remove(card)
+        CARDS.remove(card)
+        cc(card)
+    elif sum(bot_player) == 21 or x <= 0 or sum(bot_player) >= 19:
+        print("hold")
+        result()
+
+
+def result():
+    global game
+
+    if sum(bot_player) <= sum(bot_dealer):
+        print("dealer wins:", sum(bot_dealer), " over players:", sum(bot_player))
+        game = False
+    elif sum(bot_player) > sum(bot_dealer):
+        print("player wins:", sum(bot_player), " over dealers:", sum(bot_dealer))
+        game = False
+
+
+
+deal()
+print(bot_player, count)
+while game is True:
+    if sum(bot_dealer) > 21:
+        print("Dealer busts:", sum(bot_dealer))
+        quit()
+    elif sum(bot_player) > 21:
+        print("Player busts:", sum(bot_player))
+        game = False  # result function here
+    elif sum(bot_player) == 21:
+        print("hold")
+        game = False  # result function here
+    elif sum(bot_player) < 21:
+        option(count)
+        print(bot_player, "|", count, "|", sum(bot_player))
+quit()
