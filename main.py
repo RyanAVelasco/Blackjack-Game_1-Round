@@ -27,10 +27,6 @@ def deal():
             if card in DECK:
                 DECK.remove(card)
                 CARDS.remove(card)
-                # if card >= 2 and card <= 6:
-                #     count += 1
-                # elif card == 1 or card >= 10 and card <= 13: 
-                #     count -= 1
                 bot_player.append(card)
                 cc(card)
         
